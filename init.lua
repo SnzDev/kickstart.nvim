@@ -691,3 +691,30 @@ cmp.setup {
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 --
+-- setting indentation with spaces instead of tabs:
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 2
+vim.opt.tabstop = 2
+
+
+-- Setup prettier_d formatting
+require "lspconfig".efm.setup {
+  init_options = { documentFormatting = true },
+  settings = {
+    rootMarkers = { ".git/" },
+    languages = {
+      lua = {
+        { formatCommand = "lua-format -i", formatStdin = true }
+      },
+      javascript = {
+        {
+          formatCommand = 'prettierd "${INPUT}"',
+          formatStdin = true,
+          env = {
+            string.format('PRETTIERD_DEFAULT_CONFIG=%s', vim.fn.expand('~/.config/nvim/utils/linter-config/.prettierrc.json')),
+          },
+        }
+      },
+    }
+  }
+}
