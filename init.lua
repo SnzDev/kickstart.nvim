@@ -625,6 +625,14 @@ mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
 }
 
+local function organize_imports()
+  local params = {
+    command = "_typescript.organize_imports",
+    arguments = { vim.api.nvim_buf_get_name(0) },
+  }
+  vim.lsp.buf.execute_command(params)
+end
+
 mason_lspconfig.setup_handlers {
   function(server_name)
     require('lspconfig')[server_name].setup {
@@ -632,6 +640,12 @@ mason_lspconfig.setup_handlers {
       on_attach = on_attach,
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
+      commands = {
+        OImports = {
+          organize_imports,
+          description = "Organize Imports",
+        }
+      }
     }
   end,
 }
@@ -688,6 +702,7 @@ cmp.setup {
   },
 }
 
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 --
@@ -698,23 +713,3 @@ vim.opt.tabstop = 2
 
 
 -- Setup prettier_d formatting
-require "lspconfig".efm.setup {
-  init_options = { documentFormatting = true },
-  settings = {
-    rootMarkers = { ".git/" },
-    languages = {
-      lua = {
-        { formatCommand = "lua-format -i", formatStdin = true }
-      },
-      javascript = {
-        {
-          formatCommand = 'prettierd "${INPUT}"',
-          formatStdin = true,
-          env = {
-            string.format('PRETTIERD_DEFAULT_CONFIG=%s', vim.fn.expand('~/.config/nvim/utils/linter-config/.prettierrc.json')),
-          },
-        }
-      },
-    }
-  }
-}
